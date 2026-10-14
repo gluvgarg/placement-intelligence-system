@@ -1,4 +1,4 @@
-
+import mongoose from "mongoose";
 import Company from "../models/company.model.js";
 import Job from "../models/job.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -91,22 +91,35 @@ const getAllJobs = AsyncHandler(async (req, res) => {
 
 // Get a job by ID
 const getJobById = AsyncHandler(async (req, res) => {
-  const id = req.params.jobId || req.params.id;
+  const { jobId } = req.params;
 
-  if (!id) {
-    throw new ApiError(400, "Job ID is required!");
+  // 1. Validate the job ID
+  if (!jobId || !mongoose.isValidObjectId(jobId)) {
+    throw new ApiError(400, "Invalid job ID!");
   }
 
-  const job = await Job.findById(id);
+  // 2. Retrieve the job
+  const job = await Job.findById(jobId)
+    .populate("companyId");
 
   if (!job) {
     throw new ApiError(404, "Job not found!");
   }
 
+  // 3. Check whether the deadline has passed
+  const isExpired =
+    new Date(job.applicationDeadline) <= new Date();
+
+  // 4. Return job details and availability
   return res.status(200).json(
-    new ApiResponse(200, "Job found successfully!", job)
+    new ApiResponse(200, "Job retrieved successfully!", {
+      job,
+      isExpired,
+      canApply: job.status === "active" && !isExpired,
+    })
   );
 });
+
 
 
 // Update a job by ID

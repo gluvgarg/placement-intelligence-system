@@ -5,9 +5,7 @@ import cors from "cors";
 
 dotenv.config();
 
-
 const app = express();
-
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
@@ -31,5 +29,8 @@ app.use("/api/v1/companies" , companyRouter);
 import jobRouter from "./src/routes/job.routes.js";
 app.use("/api/v1/jobs", jobRouter);
 
+//application Routes
+import applicationRouter from "./src/routes/application.routes.js";
+app.use("/api/v1/applications",applicationRouter);
 
 export default app;
