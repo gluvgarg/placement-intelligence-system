@@ -56,9 +56,16 @@ const registerUser = AsyncHandler(async(req,res) => {
       mobile
     });
 
+    const createdUser = await User.findById(newUser._id)
+      .select("-password -refreshToken");
+
     res.status(201).json(
-      new ApiResponse(201 , "user registered successfully" , newUser)
-    )
+      new ApiResponse(
+        201,
+        "User registered successfully",
+        createdUser
+      )
+    ); 
 
 })
 
@@ -106,9 +113,7 @@ const loginUser = AsyncHandler(async(req,res)=>{
   .cookie("accessToken" , accessToken , options)
   .json(
     new ApiResponse(200 , "user logged in successfully" , {
-      user : loggedInUser,
-      accessToken,
-      refreshToken
+      user : loggedInUser, 
     })
   )
 
@@ -148,7 +153,6 @@ const logoutUser = AsyncHandler(async(req,res) => {
     new ApiResponse(200,"User logout Successfully")
   )
 })
-
 
 //update profile {coverimage and avatar handled separately}
 const updateProfile = AsyncHandler(async(req,res) => {

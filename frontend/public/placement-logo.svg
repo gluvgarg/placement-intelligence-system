@@ -1,0 +1,23 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+
+  <!-- Dark graphite container -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#17232C" stroke="#45616C" stroke-width="1.5"></rect>
+
+  <!-- Graduation cap -->
+  <path d="M7 22 L32 11 L57 22 L32 34 Z" fill="#A5C2CE"></path>
+
+  <!-- Graduation cap base -->
+  <path d="M16 27 V39 Q32 49 48 39 V27 L32 34 Z" fill="#5B9295"></path>
+
+  <!-- Tassel -->
+  <path d="M55 23 V39" stroke="#91AFC0" stroke-width="2.5" stroke-linecap="round"></path>
+
+  <circle cx="55" cy="42" r="3" fill="#91AFC0"></circle>
+
+  <!-- Career growth bars -->
+  <path d="M19 53 H45" stroke="#45616C" stroke-width="2" stroke-linecap="round"></path>
+
+  <path d="M23 50 V46 M31 50 V43 M39 50 V39" stroke="#91AFC0" stroke-width="3" stroke-linecap="round"></path>
+
+</svg>
