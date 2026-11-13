@@ -155,11 +155,22 @@ const Navbar = () => {
               {/* User Information */}
               <div className="flex items-center gap-3">
 
-                <div className="flex h-9 w-9 items-center
-                justify-center rounded-full border
-                border-[#5B9295]/50 bg-[#5B9295]/15
-                text-sm font-semibold text-[#A5C3C6]">
-                  {firstName.charAt(0).toUpperCase()}
+                <div className="flex h-9 w-9 shrink-0
+                  items-center justify-center overflow-hidden
+                  rounded-full border border-[#5B9295]/50
+                  bg-[#5B9295]/15 text-sm font-semibold
+                  text-[#A5C3C6]">
+
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.fullname || "Profile"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      firstName.charAt(0).toUpperCase()
+                    )}
+
                 </div>
 
                 <div className="flex flex-col">
@@ -272,10 +283,21 @@ const Navbar = () => {
                   <div className="mb-3 flex items-center gap-3
                   border-b border-white/10 pb-4">
 
-                    <div className="flex h-10 w-10
-                    items-center justify-center rounded-full
-                    bg-[#5B9295]/20 font-semibold text-[#A5C3C6]">
-                      {firstName.charAt(0).toUpperCase()}
+                    <div className="flex h-10 w-10 shrink-0
+                      items-center justify-center overflow-hidden
+                      rounded-full border border-[#5B9295]/50
+                      bg-[#5B9295]/20 font-semibold text-[#A5C3C6]">
+
+                        {user?.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.fullname || "Profile"}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          firstName.charAt(0).toUpperCase()
+                        )}
+
                     </div>
 
                     <div>

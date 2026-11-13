@@ -25,6 +25,7 @@ const applicationSchema = new Schema(
       type: String,
       enum: [
         "applied",
+        "under_review",
         "assessment",
         "shortlisted",
         "interview_scheduled",

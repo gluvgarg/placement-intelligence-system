@@ -77,14 +77,25 @@ const registerJob = AsyncHandler(async (req, res) => {
 
 
 // Get all jobs
+// Get all active jobs with company information
 const getAllJobs = AsyncHandler(async (req, res) => {
+
   const jobs = await Job.find({
     status: "active",
     applicationDeadline: { $gt: new Date() },
-  }).sort({ createdAt: -1 });
+  })
+    .populate({
+      path: "companyId",
+      select: "name location logo",
+    })
+    .sort({ createdAt: -1 });
 
   return res.status(200).json(
-    new ApiResponse(200, "Jobs retrieved successfully!", jobs)
+    new ApiResponse(
+      200,
+      "Jobs retrieved successfully!",
+      jobs
+    )
   );
 });
 

@@ -177,9 +177,19 @@ const allApplicationsByUserId = AsyncHandler(async (req, res) => {
     throw new ApiError(401, "Please log in first!");
   }
 
+  // const applications = await Application.find({ userId })
+  //   .populate("jobId")
+  //   .sort({ appliedAt: -1 });
+
   const applications = await Application.find({ userId })
-    .populate("jobId")
-    .sort({ appliedAt: -1 });
+  .populate({
+    path: "jobId",
+    populate: {
+      path: "companyId",
+      select: "name location logo",
+    },
+  })
+  .sort({ appliedAt: -1 });
 
   return res.status(200).json(
     new ApiResponse(

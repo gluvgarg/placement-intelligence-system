@@ -5,20 +5,20 @@ async function apiRequest(endpoint, options = {}) {
     throw new Error("VITE_API_BASE_URL is not configured.");
   }
 
-  const response = await fetch(
-    `${API_BASE_URL.replace(/\/$/, "")}${endpoint}`,
-    {
-      ...options,
+  const isFormData = options.body instanceof FormData;
 
-      // Send and receive HTTP-only cookies
-      credentials: "include",
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
 
-      headers: {
+    credentials: "include",
+
+    headers: {
+      ...(isFormData ? {} : {
         "Content-Type": "application/json",
-        ...options.headers,
-      },
-    }
-  );
+      }),
+      ...options.headers,
+    },
+  });
 
   // Safely parse response
   let result;
@@ -80,4 +80,84 @@ export function refreshAccessToken() {
   return apiRequest("/users/refresh-token", {
     method: "POST",
   });
+}
+
+// Update Student Profile
+export function updateUserProfile(profileData) {
+  const formData = new FormData();
+
+  formData.append("fullname", profileData.fullname);
+  formData.append("mobile", profileData.mobile);
+
+  formData.append("githubUrl", profileData.githubUrl || "");
+  formData.append("linkedinUrl", profileData.linkedinUrl || "");
+
+  formData.append("skills", JSON.stringify(profileData.skills));
+  formData.append("education", JSON.stringify(profileData.education));
+  formData.append("projects", JSON.stringify(profileData.projects));
+  formData.append("experience", JSON.stringify(profileData.experience));
+
+  if (profileData.resumeFile) {
+    formData.append("resume", profileData.resumeFile);
+  }
+
+  return apiRequest("/users/update-profile", {
+    method: "PUT",
+    body: formData,
+  });
+}
+
+// Update Profile Picture
+export function updateUserAvatar(file) {
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  return apiRequest("/users/update-avatar", {
+    method: "PUT",
+    body: formData,
+  });
+}
+
+// Update Cover Image
+export function updateUserCoverImage(file) {
+  const formData = new FormData();
+  formData.append("coverImage", file);
+
+  return apiRequest("/users/update-cover-image", {
+    method: "PUT",
+    body: formData,
+  });
+}
+
+
+// Get all active jobs
+export function getAllJobs() {
+  return apiRequest("/jobs", {
+    method: "GET",
+  });
+}
+
+// Get applications of logged-in student
+export function getMyApplications() {
+  return apiRequest("/applications/my", {
+    method: "GET",
+  });
+}
+
+// Apply for a job using the resume saved in the profile
+export function createApplication(jobId) {
+  return apiRequest(`/applications/${jobId}`, {
+    method: "POST",
+  });
+}
+
+// Withdraw an application
+export function withdrawApplication(applicationId) {
+  return apiRequest(
+    `/applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({}),
+    }
+  );
 }

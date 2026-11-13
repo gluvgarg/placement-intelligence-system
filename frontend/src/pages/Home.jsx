@@ -20,6 +20,13 @@ const Home = () => {
 
   const firstName =
     user?.fullname?.trim().split(/\s+/)[0] || "there";
+  
+  const dashboardPath =
+    role === "user"
+      ? "/student/dashboard"
+      : role === "admin"
+        ? "/admin/dashboard"
+        : "/";
 
   return (
     <> 
@@ -299,7 +306,7 @@ const Home = () => {
                   whileTap={{ scale: 0.96 }}
                 >
                   <Link
-                    to={`/${role}/dashboard`}
+                    to={dashboardPath}
                     className="group flex items-center gap-3
                     rounded-lg bg-[#5B9295] px-8 py-3.5
                     font-semibold text-[#101820]

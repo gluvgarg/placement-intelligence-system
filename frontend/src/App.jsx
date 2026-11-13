@@ -1,28 +1,71 @@
-<BrowserRouter>
-  <AuthProvider>
-    <Navbar />
 
-    <Routes>
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-      {/* Public homepage */}
-      <Route path="/" element={<Home />} />
+import { AuthProvider } from "./context/AuthContext.jsx";
 
-      {/* Guest-only pages */}
-      <Route element={<GuestRoute />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Route>
+import Navbar from "./components/layouts/Navbar.jsx";
 
-      {/* Student-only pages */}
-      <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
-      </Route>
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
 
-      {/* Admin-only pages */}
-      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      </Route>
+import Dashboard from "./pages/student/DashBoard.jsx";
+import Profile from "./pages/student/Profile.jsx";
+import Jobs from "./pages/student/Jobs.jsx";
+import Applications from "./pages/student/Application.jsx";
 
-    </Routes>
-  </AuthProvider>
-</BrowserRouter>
+import ProtectedRoute from "./routes/ProtectedRoutes.jsx";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        {/* Single Navbar */}
+        <Navbar />
+
+        <Routes>
+          {/* Public pages */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Protected student pages */}
+          <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+            <Route
+              path="/student"
+              element={<Navigate to="/student/dashboard" replace />}
+            />
+
+            <Route
+              path="/student/dashboard"
+              element={<Dashboard />}
+            />
+
+            <Route
+              path="/student/profile"
+              element={<Profile />}
+            />
+
+            <Route
+              path="/student/jobs"
+              element={<Jobs />}
+            />
+
+            <Route
+              path="/student/applications"
+              element={<Applications />}
+            />
+          </Route>
+
+          {/* Invalid URLs */}
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;

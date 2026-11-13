@@ -18,6 +18,7 @@ const applicationRouter = Router();
 // Create a new application
 applicationRouter.route("/:jobId").post(
   isAuthenticated,
+  authorizeRoles("user"),
   upload.single("resume"),
   createApplication
 );
@@ -45,6 +46,7 @@ applicationRouter.route("/:applicationId/status").patch(
 // Withdraw an application (logged-in student)
 applicationRouter.route("/:applicationId/withdraw").patch(
   isAuthenticated,
+  authorizeRoles("user"),
   withdrawApplication
 );
 

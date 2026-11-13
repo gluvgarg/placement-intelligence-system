@@ -41,7 +41,63 @@ const userSchema = new Schema({
      college : {type:String},
      yearOfPassing : {type:Number},
      cgpa : {type:Number}
-  }],
+  }], 
+  "projects": [
+    {
+      title: {
+        type: String,
+        trim: true,
+      },
+      description: {
+        type: String,
+        trim: true,
+      },
+      technologies: [
+        {
+          type: String,
+          trim: true,
+        },
+      ],
+      projectUrl: {
+        type: String,
+        trim: true,
+      },
+      githubUrl: {
+        type: String,
+        trim: true,
+      },
+    },
+  ],
+  "experience": [
+    {
+      company: {
+        type: String,
+        trim: true,
+      },
+      position: {
+        type: String,
+        trim: true,
+      },
+      employmentType: {
+        type: String,
+      },
+      startDate: {
+        type: Date,
+      },
+      endDate: {
+        type: Date,
+        default: null,
+      },
+      currentlyWorking: {
+        type: Boolean,
+        default: false,
+      },
+      description: {
+        type: String,
+        trim: true,
+      },
+    },
+  ],
   "resumeUrl":{
     type:String
   },

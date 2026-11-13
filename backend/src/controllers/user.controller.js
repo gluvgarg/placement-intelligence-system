@@ -155,75 +155,207 @@ const logoutUser = AsyncHandler(async(req,res) => {
 })
 
 //update profile {coverimage and avatar handled separately}
-const updateProfile = AsyncHandler(async(req,res) => {
-  const user = await User.findById(req.user._id);
+// const updateProfile = AsyncHandler(async(req,res) => {
+//   const user = await User.findById(req.user._id);
 
-  if(!user){
-    throw new ApiError(404 , "user not found");
-  }
+//   if(!user){
+//     throw new ApiError(404 , "user not found");
+//   }
 
-  const { githubUrl , linkedinUrl} = req.body;
+//   const { githubUrl , linkedinUrl} = req.body;
 
-  let skills;
+//   let skills;
 
-  if (req.body.skills !== undefined) {
-    try {
-      skills = JSON.parse(req.body.skills);
-    } catch (error) {
-      throw new ApiError(400, "Invalid skills data");
-    }
-  }
+//   if (req.body.skills !== undefined) {
+//     try {
+//       skills = JSON.parse(req.body.skills);
+//     } catch (error) {
+//       throw new ApiError(400, "Invalid skills data");
+//     }
+//   }
 
-  let education;
+//   let education;
 
-  if (req.body.education !== undefined) {
-    try {
-      education = JSON.parse(req.body.education);
-    } catch (error) {
-      throw new ApiError(400, "Invalid education data");
-    }
-  }
+//   if (req.body.education !== undefined) {
+//     try {
+//       education = JSON.parse(req.body.education);
+//     } catch (error) {
+//       throw new ApiError(400, "Invalid education data");
+//     }
+//   }
  
 
+//   if (skills !== undefined) {
+//         user.skills = skills;
+//     }
+
+//     if (education !== undefined) {
+//         user.education = education;
+//     }
+
+//     if (githubUrl !== undefined) {
+//         user.githubUrl = githubUrl;
+//     }
+
+//     if (linkedinUrl !== undefined) {
+//         user.linkedinUrl = linkedinUrl;
+//     }
+
+//   if (req.file) {
+
+//         const resumeUrl =
+//             await uploadOnCloudinary(req.file.path);
+
+//         if (!resumeUrl) {
+//             throw new ApiError(
+//                 500,
+//                 "Failed to upload resume"
+//             );
+//         }
+
+//         user.resumeUrl = resumeUrl;
+//     }
+
+//   await user.save();
+
+//   const updatedUser = await User.findById(req.user._id).select("-password -refreshToken");
+
+//   res.status(200).json(
+//     new ApiResponse(200 , "user profile updated successfully" , updatedUser)
+//   )
+// })
+
+
+const updateProfile = AsyncHandler(async (req, res) => {
+
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const {
+    fullname,
+    mobile,
+    githubUrl,
+    linkedinUrl
+  } = req.body;
+
+  // Helper: parse JSON arrays from FormData
+  const parseArray = (field, fieldName) => {
+    if (field === undefined) return undefined;
+
+    let parsed;
+
+    try {
+      parsed = typeof field === "string"
+        ? JSON.parse(field)
+        : field;
+    } catch {
+      throw new ApiError(400, `Invalid ${fieldName} data`);
+    }
+
+    if (!Array.isArray(parsed)) {
+      throw new ApiError(400, `${fieldName} must be an array`);
+    }
+
+    return parsed;
+  };
+
+  // Basic information
+  if (fullname !== undefined) {
+    if (!fullname.trim()) {
+      throw new ApiError(400, "Full name cannot be empty");
+    }
+
+    user.fullname = fullname.trim();
+  }
+
+  if (mobile !== undefined) {
+    if (mobile === "") {
+      user.mobile = undefined;
+    } else {
+      const mobileNumber = Number(mobile);
+
+      if (!Number.isSafeInteger(mobileNumber) ||
+          mobileNumber < 1000000000 ||
+          mobileNumber > 9999999999) {
+        throw new ApiError(400, "Invalid 10-digit mobile number");
+      }
+
+      user.mobile = mobileNumber;
+    }
+  }
+
+  if (githubUrl !== undefined) {
+    user.githubUrl = githubUrl.trim();
+  }
+
+  if (linkedinUrl !== undefined) {
+    user.linkedinUrl = linkedinUrl.trim();
+  }
+
+  // Parse profile arrays
+  const skills = parseArray(req.body.skills, "skills");
+  const education = parseArray(req.body.education, "education");
+  const projects = parseArray(req.body.projects, "projects");
+  const experience = parseArray(req.body.experience, "experience");
+
   if (skills !== undefined) {
-        user.skills = skills;
+    if (!skills.every(skill => typeof skill === "string")) {
+      throw new ApiError(400, "Skills must contain strings");
     }
 
-    if (education !== undefined) {
-        user.education = education;
-    }
+    user.skills = skills
+      .map(skill => skill.trim())
+      .filter(Boolean);
+  }
 
-    if (githubUrl !== undefined) {
-        user.githubUrl = githubUrl;
-    }
+  if (education !== undefined) {
+    user.education = education;
+  }
 
-    if (linkedinUrl !== undefined) {
-        user.linkedinUrl = linkedinUrl;
-    }
+  if (projects !== undefined) {
+    user.projects = projects;
+  }
 
+  if (experience !== undefined) {
+    user.experience = experience;
+  }
+
+  // Resume upload
   if (req.file) {
-
-        const resumeUrl =
-            await uploadOnCloudinary(req.file.path);
-
-        if (!resumeUrl) {
-            throw new ApiError(
-                500,
-                "Failed to upload resume"
-            );
-        }
-
-        user.resumeUrl = resumeUrl;
+    if (req.file.mimetype !== "application/pdf") {
+      throw new ApiError(400, "Resume must be a PDF file");
     }
+
+    if (req.file.size > 5 * 1024 * 1024) {
+      throw new ApiError(400, "Resume must be smaller than 5 MB");
+    }
+
+    const resumeUrl = await uploadOnCloudinary(req.file.path);
+
+    if (!resumeUrl) {
+      throw new ApiError(500, "Failed to upload resume");
+    }
+
+    user.resumeUrl = resumeUrl;
+  }
 
   await user.save();
 
-  const updatedUser = await User.findById(req.user._id).select("-password -refreshToken");
+  const updatedUser = await User.findById(req.user._id)
+    .select("-password -refreshToken");
 
-  res.status(200).json(
-    new ApiResponse(200 , "user profile updated successfully" , updatedUser)
-  )
-})
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "Profile updated successfully",
+      updatedUser
+    )
+  );
+});
+
 
 //update avatar of the user
 const updateAvatar = AsyncHandler(async(req,res) => {
