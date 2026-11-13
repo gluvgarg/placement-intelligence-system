@@ -224,8 +224,6 @@ const logoutUser = AsyncHandler(async(req,res) => {
 //     new ApiResponse(200 , "user profile updated successfully" , updatedUser)
 //   )
 // })
-
-
 const updateProfile = AsyncHandler(async (req, res) => {
 
   const user = await User.findById(req.user._id);
@@ -485,6 +483,23 @@ const getProfile = AsyncHandler(async(req,res) => {
   )
 })
 
+
+// Get all student accounts (admin only)
+const getAllStudents = AsyncHandler(async (req, res) => {
+  const students = await User.find({ role: "user" })
+    .select("-password -refreshToken")
+    .sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "Student records retrieved successfully",
+      students
+    )
+  );
+});
+
+
 export {
   registerUser,
   loginUser,
@@ -494,4 +509,5 @@ export {
   updateAvatar,
   updateCoverImage,
   getProfile,
+  getAllStudents
 }

@@ -42,6 +42,7 @@ const Navbar = () => {
         { label: "Dashboard", path: "/admin/dashboard" },
         { label: "Companies", path: "/admin/companies" },
         { label: "Jobs", path: "/admin/jobs" },
+        { label: "Students", path: "/admin/students" },
         { label: "Applications", path: "/admin/applications" },
       ]
     : isStudent

@@ -7,6 +7,7 @@ import {
   updateJob,
   deleteJob,
   getJobByCompanyId,
+  getAllJobsForAdmin,
 } from "../controllers/job.controller.js";
 
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
@@ -43,5 +44,10 @@ jobRouter
 jobRouter
   .route("/:jobId")
   .delete(isAuthenticated, authorizeRoles("admin"), deleteJob);
+
+// Admin: retrieve every job
+jobRouter
+  .route("/admin/all")
+  .get(isAuthenticated, authorizeRoles("admin"), getAllJobsForAdmin);
 
 export default jobRouter

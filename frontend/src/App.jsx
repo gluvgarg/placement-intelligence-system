@@ -14,6 +14,12 @@ import Profile from "./pages/student/Profile.jsx";
 import Jobs from "./pages/student/Jobs.jsx";
 import Applications from "./pages/student/Application.jsx";
 
+import AdminDashboard from "./pages/admin/Dashboard.jsx";
+import Companies from "./pages/admin/Companies.jsx";
+import AdminJobs from "./pages/admin/Jobs.jsx";
+import Students from "./pages/admin/Students.jsx";
+import AdminApplications from "./pages/admin/Applications.jsx";
+
 import ProtectedRoute from "./routes/ProtectedRoutes.jsx";
 
 function App() {
@@ -54,6 +60,35 @@ function App() {
             <Route
               path="/student/applications"
               element={<Applications />}
+            />
+          </Route>
+
+
+          {/* Protected admin pages */}
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route
+              path="/admin/dashboard"
+              element={<AdminDashboard />}
+            />
+
+            <Route
+              path="/admin/companies"
+              element={<Companies />} 
+            />
+
+            <Route
+              path="/admin/jobs"
+              element={<AdminJobs />}
+            />
+
+            <Route
+              path="/admin/students"
+              element={<Students />}
+            />
+
+            <Route
+              path="/admin/applications"
+              element={<AdminApplications />}
             />
           </Route>
 

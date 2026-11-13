@@ -100,6 +100,26 @@ const getAllJobs = AsyncHandler(async (req, res) => {
 });
 
 
+// Get all jobs for admin, including closed and expired jobs
+const getAllJobsForAdmin = AsyncHandler(async (req, res) => {
+  const jobs = await Job.find()
+    .populate({
+      path: "companyId",
+      select: "name location logo",
+    })
+    .sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "All jobs retrieved successfully!",
+      jobs
+    )
+  );
+});
+
+
+
 // Get a job by ID
 const getJobById = AsyncHandler(async (req, res) => {
   const { jobId } = req.params;
@@ -148,6 +168,8 @@ const updateJob = AsyncHandler(async (req, res) => {
     mode,
     salary,
     applicationDeadline,
+    status,
+    companyId,
   } = req.body;
 
   const updatedData = {};
@@ -204,6 +226,30 @@ const updateJob = AsyncHandler(async (req, res) => {
       throw new ApiError(400, "Skills must be an array!");
     }
     updatedData.skills = skills;
+  }
+
+  // Update job status
+  if (status !== undefined) {
+    if (!["active", "closed"].includes(status)) {
+      throw new ApiError(400, "Invalid job status!");
+    }
+
+    updatedData.status = status;
+  }
+
+  // Update associated company
+  if (companyId !== undefined) {
+    if (!mongoose.isValidObjectId(companyId)) {
+      throw new ApiError(400, "Invalid company ID!");
+    }
+
+    const company = await Company.findById(companyId);
+
+    if (!company) {
+      throw new ApiError(404, "Company does not exist!");
+    }
+
+    updatedData.companyId = company._id;
   }
 
   if (Object.keys(updatedData).length === 0) {
@@ -271,6 +317,7 @@ const getJobByCompanyId = AsyncHandler(async (req, res) => {
 export {
   registerJob,
   getAllJobs,
+  getAllJobsForAdmin,
   getJobById,
   updateJob,
   deleteJob,

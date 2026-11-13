@@ -161,3 +161,102 @@ export function withdrawApplication(applicationId) {
     }
   );
 }
+
+
+// Get all students (admin only)
+export function getAllStudents() {
+  return apiRequest("/users", {
+    method: "GET",
+  });
+}
+
+// Get all applications (admin only)
+export function getAllApplications() {
+  return apiRequest("/applications", {
+    method: "GET",
+  });
+}
+
+// Get all registered companies
+export function getAllCompanies() {
+  return apiRequest("/companies", {
+    method: "GET",
+  });
+}
+
+function buildCompanyFormData(companyData) {
+  const formData = new FormData();
+
+  ["name", "description", "manager", "email", "contact", "location"]
+    .forEach((field) => {
+      formData.append(field, companyData[field] ?? "");
+    });
+
+  if (companyData.logoFile) {
+    formData.append("logo", companyData.logoFile);
+  }
+
+  return formData;
+}
+
+// Register a company (admin only)
+export function createCompany(companyData) {
+  return apiRequest("/companies", {
+    method: "POST",
+    body: buildCompanyFormData(companyData),
+  });
+}
+
+// Update company details (admin only)
+export function updateCompany(companyId, companyData) {
+  return apiRequest(`/companies/${companyId}`, {
+    method: "PATCH",
+    body: buildCompanyFormData(companyData),
+  });
+}
+
+// Delete a company (admin only)
+export function deleteCompany(companyId) {
+  return apiRequest(`/companies/${companyId}`, {
+    method: "DELETE",
+  });
+}
+
+
+// Get all jobs, including closed and expired ones (admin only)
+export function getAllJobsForAdmin() {
+  return apiRequest("/jobs/admin/all", {
+    method: "GET",
+  });
+}
+
+// Create a job under a company (admin only)
+export function createJob(companyId, jobData) {
+  return apiRequest(`/jobs/register/${companyId}`, {
+    method: "POST",
+    body: JSON.stringify(jobData),
+  });
+}
+
+// Update job details or status (admin only)
+export function updateJob(jobId, jobData) {
+  return apiRequest(`/jobs/${jobId}`, {
+    method: "PATCH",
+    body: JSON.stringify(jobData),
+  });
+}
+
+// Delete a job (admin only)
+export function deleteJob(jobId) {
+  return apiRequest(`/jobs/${jobId}`, {
+    method: "DELETE",
+  });
+}
+  
+
+export function updateApplicationStatus(applicationId, data) {
+  return apiRequest(`/applications/${applicationId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

@@ -6,7 +6,8 @@ import {
   allApplicationByJobId,
   allApplicationsByUserId,
   getApplication,
-  withdrawApplication
+  withdrawApplication,
+  getAllApplications
 } from "../controllers/application.controller.js";
 
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
@@ -54,6 +55,13 @@ applicationRouter.route("/:applicationId/withdraw").patch(
 applicationRouter.route("/:applicationId").get(
   isAuthenticated,
   getApplication
+);
+
+// Get all applications (admin only)
+applicationRouter.route("/").get(
+  isAuthenticated,
+  authorizeRoles("admin"),
+  getAllApplications
 );
 
 export default applicationRouter;

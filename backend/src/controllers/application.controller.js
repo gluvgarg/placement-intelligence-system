@@ -276,11 +276,40 @@ const withdrawApplication = AsyncHandler(async (req, res) => {
   );
 });
 
+
+// Get all applications (admin only)
+const getAllApplications = AsyncHandler(async (req, res) => {
+  const applications = await Application.find()
+    .populate({
+      path: "userId",
+      select: "fullname email mobile avatar",
+    })
+    .populate({
+      path: "jobId",
+      select: "title jobType mode salary status applicationDeadline companyId",
+      populate: {
+        path: "companyId",
+        select: "name location logo",
+      },
+    })
+    .sort({ appliedAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "All applications retrieved successfully",
+      applications
+    )
+  );
+});
+
+
 export {
   createApplication,
   updateApplicationStatus,
   allApplicationByJobId,
   allApplicationsByUserId,
   getApplication,
-  withdrawApplication
+  withdrawApplication,
+  getAllApplications
 }
